@@ -1,38 +1,38 @@
 # ko-offline-tts
 An offline, high-quality Korean Text-to-Speech (TTS) application using VITS-Mimic3
 
-# 🔊 Sherpa-Onnx Supertonic Korean TTS (All-in-One Portable)
+# 🔊 TTS Generator - 오프라인 한국어 음성 생성기
 
-![License](https://img.shields.io/badge/license-Apache--2.0-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows%20x64-lightgrey)
-![Environment](https://img.shields.io/badge/environment-100%25%20Offline-success)
-![Engine](https://img.shields.io/badge/engine-Sherpa--Onnx--Supertonic-orange)
+![Environment](https://img.shields.io/badge/environment-100%25%20Offline%20(WASM)-success)
+![License](https://img.shields.io/badge/license-Apache%202.0%20%2F%20CC%20BY--SA%204.0-blue)
 
-인터넷 연결이 전혀 불가능한 폐쇄망, 보안 환경, 연구소 등에서도 **다운로드나 파이썬 설치 과정 없이 압축만 풀면 즉시 실행 가능한** 독립 패키지형 한국어 오프라인 TTS(Text-to-Speech) 프로그램입니다.
+인터넷 연결이 전혀 없는 환경(폐쇄망, 보안 환경 등)에서도 **추가 다운로드나 파이썬 설치 과정 없이** 압축만 풀면 브라우저 내에서 즉시 고품질 한국어 음성을 생성할 수 있는 완벽한 독립형(Portable) 웹 애플리케이션입니다.
 
-Next-Gen Kaldi의 최신 `sherpa-onnx` 엔진과 **차세대 고성능 모델인 `Supertonic-int8` 한국어 음성 모델**을 완벽하게 내장하고 있습니다. 실행 즉시 로컬 웹 서버가 구동되며, 직관적인 웹 UI를 통해 마우스 클릭 몇 번으로 부드럽고 자연스러운 한국어 음성을 생성할 수 있습니다.
+`python/` 폴더 내에 Python 3.14 Embeddable 버전이 내장되어 있어 환경 변수 설정이나 패키지 설치가 필요 없으며, **sherpa-onnx WASM** 기술을 이용해 모든 음성 합성 연산이 서버가 아닌 사용자의 브라우저 내부에서 안전하고 빠르게 처리됩니다. USB에 복사하여 다른 PC로 이동해도 즉시 실행 가능합니다.
 
 ---
 
 ## ✨ 주요 특징 (Key Features)
 
-* **🚀 무설치 원클릭 실행 (`Start.bat`):** 사용자의 컴퓨터에 파이썬(Python)이 설치되어 있지 않아도 괜찮습니다. 내장된 임베디드 파이썬 런타임 환경으로 독립 구동됩니다.
-* **🔒 100% 완전 오프라인:** 모델 파싱 및 라이브러리가 모두 패키지 내에 사전 빌드되어 있어, 실행 시 어떠한 외부 다운로드나 네트워크 연결도 요구하지 않습니다.
-* **⚡ 최신 Supertonic int8 모델 내장:** 기존 VITS 모델 대비 더욱 인간에 가까운 자연스러운 한국어 억양을 제공하며, INT8 양자화 적용으로 저사양 로컬 PC에서도 딜레이 없이 가볍고 빠르게 음성을 합성합니다.
-* **🌐 편리한 웹 인터페이스 (Web UI):** 배치를 실행하면 자동으로 로컬 웹 서버가 켜지며 익숙한 웹 브라우저 창에서 간편하게 텍스트를 음성으로 변환할 수 있습니다.
+* **🚀 무설치 원클릭 구동:** 사용자 PC에 파이썬이 없어도 작동합니다. 배치 파일 실행 시 내장 런타임으로 로컬 서버를 가볍게 구동합니다.
+* **🌐 100% 브라우저 로컬 연산 (WASM):** `sherpa-onnx WASM` 엔진을 채택하여, 서버 측 부하 없이 브라우저 자체의 자원으로 완벽한 오프라인 음성 합성을 수행합니다.
+* **🎵 내장 MP3 다운로드:** `lamejs` 인코더가 브라우저 내에 빌트인되어 있어, 생성된 한국어 음성을 즉시 재생하고 고음질 MP3 파일로 안전하게 저장할 수 있습니다.
+* **🔒 완벽한 오프라인 & 포터블:** 외부 네트워크 연결이나 API 호출이 일절 없어 데이터 유출 우려가 없으며, 보안이 중요한 환경에 최적화되어 있습니다.
 
 ---
 
-## 🛠️ 폴더 구조 (Project Structure)
+## 🛠️ 배포 및 폴더 구조 (Project Structure)
 
-배포 파일은 군더더기 없이 최적의 런타임 파일로만 압축되어 있습니다.
+배포 패키지(`offline-korean-tts/`)는 개발용 파일(`node_modules/`, `__tests__/`, `package.json` 등)을 제외하고 오직 실행에 필수적인 최적의 핵심 파일들로만 컴팩트하게 구성되어 있습니다.
 
 ```text
-├── assets/                     # 웹 UI(인터페이스) 구성에 필요한 리소스 파일
-├── models/                     # 완전히 내장된 최신 Supertonic-int8 한국어 TTS 모델 파일
-├── python/                     # 무설치 구동을 위한 임베디드 파이썬(python-3.14.5) 런타임
-├── index.html                  # 사용자가 접속하여 TTS를 조작하는 로컬 웹 화면
-├── server.py                   # sherpa-onnx 엔진을 구동하고 API를 제공하는 백엔드 서버
-├── start.bat                   # 🚀 로컬 웹 서버 구동 및 웹 브라우저 자동 실행 배치 파일
-├── README.txt                  # 오프라인 사용자를 위한 텍스트 가이드 설명서
-└── tts-icon.ico                # 프로그램 및 웹 타이틀에 사용되는 아이콘 파일
+offline-korean-tts/
+├── assets/                     # 🌐 핵심 엔진 (JS/CSS 및 sherpa-onnx WASM 라이브러리)
+├── models/                     # 🗣️ 한국어 음성 합성 모델 (ko_KO-kss_low)
+├── python/                     # 🐍 무설치 구동용 Python 3.14 Embeddable 내장 런타임
+├── index.html                  # 🖥️ 사용자 친화적인 TTS 조작 웹 애플리케이션 화면
+├── server.py                   # 📡 정적 파일 서빙 및 로컬 웹 서버 구동 스크립트
+├── start.bat                   # 🚀 메인 실행 파일
+├── tts-icon.ico                # 🎨 바로가기 생성용 마이크 아이콘 파일
+└── README.txt                  # 📄 오프라인 사용자를 위한 텍스트 설명서
