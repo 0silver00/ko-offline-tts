@@ -1,0 +1,26 @@
+# 개발용
+node_modules/
+__tests__/
+package.json
+package-lock.json
+jest.config.js
+
+# 큰 바이너리 (Release에 첨부)
+assets/wasm/sherpa-onnx-wasm-main-tts.data
+assets/wasm/sherpa-onnx-wasm-main-tts.wasm
+models/duration_predictor.int8.onnx
+models/text_encoder.int8.onnx
+models/vector_estimator.int8.onnx
+models/vocoder.int8.onnx
+models/voice.bin
+models/unicode_indexer.bin
+
+# Python 내장 런타임 (Release에 첨부)
+python/
+
+# 배포 ZIP
+*.zip
+
+# OS
+Thumbs.db
+.DS_Store

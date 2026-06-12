@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TTS Generator</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎙️</text></svg>">
+  <link rel="stylesheet" href="assets/css/style.css?v=2">
+  <script src="assets/js/config.js"></script>
+  <script src="assets/lib/lame.min.js"></script>
+  <script type="module">
+    import Module from './assets/wasm/sherpa-onnx-wasm-main-tts.js';
+    window.SherpaOnnxModule = Module;
+    window.dispatchEvent(new Event('sherpa-onnx-ready'));
+  </script>
+  <script src="assets/js/sherpa-onnx-tts.js"></script>
+  <script src="assets/js/validator.js"></script>
+  <script src="assets/js/mp3-encoder.js"></script>
+  <script src="assets/js/tts-engine.js"></script>
+  <script src="assets/js/app.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <!-- 헤더 -->
+    <header class="app-header">
+      <div class="header-icon">🎙️</div>
+      <div class="header-text">
+        <h1>TTS Generator</h1>
+        <p>텍스트를 자연스러운 음성으로 변환해 보세요.</p>
+      </div>
+    </header>
+
+    <!-- 상단: 텍스트 입력 + 설정 -->
+    <section class="top-row">
+      <!-- 텍스트 입력 카드 -->
+      <div class="card card-input">
+        <div class="card-title">🎤 텍스트 입력</div>
+        <textarea
+          id="text-input"
+          placeholder="여기에 변환할 텍스트를 입력하세요."
+        ></textarea>
+        <div class="input-footer">
+          <span class="char-count"><span id="char-count">0</span> / 10,000자</span>
+          <label class="upload-btn" for="file-upload" title=".txt 파일 업로드">
+            <span class="upload-btn-inner">📂 .txt 파일 열기</span>
+            <input type="file" id="file-upload" accept=".txt" hidden>
+          </label>
+        </div>
+      </div>
+
+      <!-- 설정 카드 -->
+      <div class="card card-settings">
+        <div class="card-title">⚙️ 설정</div>
+
+        <!-- 화자 선택 -->
+        <div class="setting-group">
+          <div class="setting-label">
+            <span>화자 선택</span>
+          </div>
+          <select id="speaker-select" class="speaker-select">
+            <option value="1">서연 (여성)</option>
+            <option value="0">하늘 (여성)</option>
+            <option value="5">성훈 (남성)</option>
+          </select>
+        </div>
+
+        <!-- 음성 속도 -->
+        <div class="setting-group">
+          <div class="setting-label">
+            <span>음성 속도</span>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" id="speed-slider" min="0.5" max="2.0" step="0.1" value="1.0">
+            <input type="number" id="speed-input" min="0.5" max="2.0" step="0.1" value="1.0" class="num-input">
+          </div>
+          <div class="slider-labels">
+            <span>0.5x</span><span style="position:absolute;left:24%;">1.0x</span><span>2.0x</span>
+          </div>
+        </div>
+
+        <!-- 음높이 -->
+        <!-- <div class="setting-group">
+          <div class="setting-label">
+            <span>음성 높낮이 (피치) ⓘ</span>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" id="pitch-slider" min="-10" max="10" step="1" value="0">
+            <input type="number" id="pitch-input" min="-10" max="10" step="1" value="0" class="num-input">
+          </div>
+          <div class="slider-labels">
+            <span>-10</span><span>0</span><span>+10</span>
+          </div>
+        </div> -->
+
+        <!-- Generate 버튼 -->
+        <button type="button" id="synthesize-btn" class="btn-generate" disabled>
+          ✦ Generate (음성 생성)
+        </button>
+        <div id="status-message" class="status-message" role="status" aria-live="polite">
+          설정을 선택한 후 Generate 버튼을 클릭하세요.
+        </div>
+      </div>
+    </section>
+
+    <!-- 하단: 다운로드 + 사용 방법 -->
+    <section class="bottom-row">
+      <!-- 다운로드 카드 -->
+      <div class="card card-download">
+        <div class="card-title">📥 다운로드</div>
+
+        <div class="filename-row">
+          <span class="filename-label">파일명 입력</span>
+          <input type="text" id="filename-input" placeholder="output">
+          <span class="filename-ext">.mp3</span>
+        </div>
+
+        <!-- 오디오 프리뷰 -->
+        <div class="audio-preview" id="player-bar">
+          <div class="audio-placeholder" id="audio-placeholder">
+            <div class="audio-icon">🎵</div>
+            <span>생성된 음성이 여기에 표시됩니다.</span>
+          </div>
+          <audio id="audio-player" controls hidden></audio>
+        </div>
+
+        <button type="button" id="download-btn" class="btn-download" disabled>
+          ⬇ MP3 다운로드
+        </button>
+        <p class="download-hint">음성 생성 후 미리듣기를 확인하고 다운로드할 수 있습니다.</p>
+      </div>
+
+      <!-- 사용 방법 카드 -->
+      <div class="card card-help">
+        <div class="card-title">📖 사용 방법</div>
+        <div class="help-list">
+          <div class="help-item">
+            <span class="help-num">1</span>
+            <div>
+              <strong>텍스트 입력</strong>
+              <p>텍스트 입력 영역에 한국어 텍스트를 직접 입력하거나, 📂 버튼으로 .txt 파일을 업로드하세요. 최대 10,000자까지 지원합니다.</p>
+            </div>
+          </div>
+          <div class="help-item">
+            <span class="help-num">2</span>
+            <div>
+              <strong>설정 조정</strong>
+              <p>음성 속도(0.5x~2.0x)를 슬라이더로 조절하세요. 기본값은 속도 1.0x 입니다.</p>
+            </div>
+          </div>
+          <div class="help-item">
+            <span class="help-num">3</span>
+            <div>
+              <strong>음성 생성</strong>
+              <p>Generate 버튼을 클릭하면 브라우저 내부에서 음성이 합성됩니다. 인터넷 연결이 필요하지 않습니다.</p>
+            </div>
+          </div>
+          <div class="help-item">
+            <span class="help-num">4</span>
+            <div>
+              <strong>미리듣기 및 다운로드</strong>
+              <p>합성 완료 후 오디오 플레이어로 바로 재생하고, 파일명을 입력한 뒤 MP3 다운로드 버튼으로 저장하세요.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
