@@ -24,3 +24,6 @@ python/
 # OS
 Thumbs.db
 .DS_Store
+
+# etc
+TTS Generator.bat
